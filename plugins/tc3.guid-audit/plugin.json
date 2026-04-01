@@ -1,0 +1,9 @@
+{
+  "id": "tc3.guid-audit",
+  "name": "TwinCAT GUID Audit",
+  "version": "1.0.0",
+  "description": "Detects duplicate project-level and object-level GUIDs across TwinCAT projects.",
+  "entryAssembly": "Tc3ProjectTools.Plugins.GuidAudit.dll",
+  "entryType": "Tc3ProjectTools.Plugins.GuidAudit.GuidAuditPluginEntryPoint",
+  "minHostVersion": "1.0.0"
+}

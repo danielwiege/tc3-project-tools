@@ -1,0 +1,20 @@
+<Solution>
+  <Configurations>
+    <Platform Name="Any CPU" />
+    <Platform Name="x64" />
+    <Platform Name="x86" />
+  </Configurations>
+  <Folder Name="/plugins/">
+    <Project Path="plugins/Tc3ProjectTools.Plugins.Cleanup/Tc3ProjectTools.Plugins.Cleanup.csproj" />
+    <Project Path="plugins/Tc3ProjectTools.Plugins.GuidAudit/Tc3ProjectTools.Plugins.GuidAudit.csproj" />
+  </Folder>
+  <Folder Name="/src/">
+    <Project Path="src/Tc3ProjectTools.Abstractions/Tc3ProjectTools.Abstractions.csproj" />
+    <Project Path="src/Tc3ProjectTools.Host/Tc3ProjectTools.Host.csproj" />
+    <Project Path="src/Tc3ProjectTools.Runtime/Tc3ProjectTools.Runtime.csproj" />
+  </Folder>
+  <Folder Name="/tests/">
+    <Project Path="tests/Tc3ProjectTools.IntegrationTests/Tc3ProjectTools.IntegrationTests.csproj" />
+    <Project Path="tests/Tc3ProjectTools.Runtime.Tests/Tc3ProjectTools.Runtime.Tests.csproj" />
+  </Folder>
+</Solution>

@@ -1,0 +1,20 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <IsPackable>false</IsPackable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\src\Tc3ProjectTools.Abstractions\Tc3ProjectTools.Abstractions.csproj" />
+    <ProjectReference Include="..\..\src\Tc3ProjectTools.Runtime\Tc3ProjectTools.Runtime.csproj" />
+    <ProjectReference Include="..\..\plugins\Tc3ProjectTools.Plugins.Cleanup\Tc3ProjectTools.Plugins.Cleanup.csproj" />
+    <ProjectReference Include="..\..\plugins\Tc3ProjectTools.Plugins.GuidAudit\Tc3ProjectTools.Plugins.GuidAudit.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="coverlet.collector" />
+    <PackageReference Include="Microsoft.NET.Test.Sdk" />
+    <PackageReference Include="xunit" />
+    <PackageReference Include="xunit.runner.visualstudio" />
+    <Using Include="Xunit" />
+  </ItemGroup>
+</Project>

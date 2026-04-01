@@ -1,0 +1,38 @@
+[
+  {
+    "id": "user-local-files",
+    "name": "User Local Files",
+    "description": "Removes editor-specific state such as .suo and .user files.",
+    "enabledByDefault": true,
+    "isRisky": false,
+    "filePatterns": [ "*.suo", "*.user" ],
+    "directoryNames": [ ".vs" ]
+  },
+  {
+    "id": "build-output",
+    "name": "Build Output",
+    "description": "Removes build output folders that can be regenerated.",
+    "enabledByDefault": true,
+    "isRisky": false,
+    "filePatterns": [],
+    "directoryNames": [ "bin", "obj", "_Boot" ]
+  },
+  {
+    "id": "twincat-generated-outputs",
+    "name": "TwinCAT Generated Outputs",
+    "description": "Optional removal of generated TwinCAT outputs such as TMC and TPY files.",
+    "enabledByDefault": false,
+    "isRisky": true,
+    "filePatterns": [ "*.tmc", "*.tpy" ],
+    "directoryNames": []
+  },
+  {
+    "id": "backup-files",
+    "name": "Backup Files",
+    "description": "Optional cleanup of backup or temporary save files.",
+    "enabledByDefault": false,
+    "isRisky": true,
+    "filePatterns": [ "*.bak", "*.backup", "*~" ],
+    "directoryNames": []
+  }
+]

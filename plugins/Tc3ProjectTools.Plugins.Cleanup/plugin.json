@@ -1,0 +1,9 @@
+{
+  "id": "tc3.cleanup",
+  "name": "TwinCAT Cleanup",
+  "version": "1.0.0",
+  "description": "Rules-based cleanup for unnecessary TwinCAT project files.",
+  "entryAssembly": "Tc3ProjectTools.Plugins.Cleanup.dll",
+  "entryType": "Tc3ProjectTools.Plugins.Cleanup.CleanupPluginEntryPoint",
+  "minHostVersion": "1.0.0"
+}
