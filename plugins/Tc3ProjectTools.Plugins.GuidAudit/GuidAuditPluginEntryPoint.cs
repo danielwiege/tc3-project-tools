@@ -14,7 +14,7 @@ public sealed class GuidAuditPluginEntryPoint : IPluginEntryPoint
             {
                 Id = "guid.audit",
                 DisplayName = "Audit GUID Duplicates",
-                Description = "Checks for duplicate project-level and object-level GUIDs across TwinCAT projects.",
+                Description = "Checks for duplicate project GUIDs across TwinCAT projects.",
                 Ribbon = new RibbonContribution
                 {
                     TabKey = "twincat",
@@ -40,44 +40,27 @@ public sealed partial class GuidAuditToolRunner : IToolRunner
     public Task<ToolResult> ExecuteAsync(ToolExecutionRequest request, CancellationToken cancellationToken = default)
     {
         var occurrences = new List<GuidOccurrence>();
-        var skippedFiles = new List<string>();
+        var skippedProjects = new List<string>();
 
         foreach (var project in request.Context.Workspace.Projects)
         {
-            var projectFiles = project.SupportingFiles.Append(project.ProjectPath).Distinct(StringComparer.OrdinalIgnoreCase);
-            foreach (var file in projectFiles)
+            cancellationToken.ThrowIfCancellationRequested();
+            try
             {
-                cancellationToken.ThrowIfCancellationRequested();
-                try
-                {
-                    var document = XDocument.Load(file, LoadOptions.SetLineInfo);
-                    occurrences.AddRange(ExtractOccurrences(project, file, document));
-                }
-                catch (Exception ex)
-                {
-                    skippedFiles.Add(file);
-                    _logger.LogDebug(ex, "Skipping non-XML or unreadable file {WorkspaceFile}", file);
-                }
+                var document = XDocument.Load(project.ProjectPath, LoadOptions.SetLineInfo);
+                occurrences.AddRange(ExtractOccurrences(project, project.ProjectPath, document)
+                    .Where(occurrence => occurrence.Kind == GuidOccurrenceKind.Project));
+            }
+            catch (Exception ex)
+            {
+                skippedProjects.Add(project.ProjectPath);
+                _logger.LogDebug(ex, "Skipping unreadable project file {ProjectFile}", project.ProjectPath);
             }
         }
 
         var projectDuplicates = occurrences
-            .Where(occurrence => occurrence.Kind == GuidOccurrenceKind.Project)
             .GroupBy(occurrence => occurrence.Value)
             .Where(group => group.Select(occurrence => occurrence.SourceProjectPath).Distinct(StringComparer.OrdinalIgnoreCase).Count() > 1)
-            .ToList();
-
-        var objectDuplicates = occurrences
-            .Where(occurrence => occurrence.Kind == GuidOccurrenceKind.Object)
-            .GroupBy(occurrence => occurrence.Value)
-            .Where(group => group.Select(occurrence => occurrence.SourceProjectPath).Distinct(StringComparer.OrdinalIgnoreCase).Count() > 1)
-            .ToList();
-
-        var sameProjectRepeats = occurrences
-            .GroupBy(occurrence => occurrence.Value)
-            .Where(group =>
-                group.Count() > 1
-                && group.Select(occurrence => occurrence.SourceProjectPath).Distinct(StringComparer.OrdinalIgnoreCase).Count() == 1)
             .ToList();
 
         var tables = new List<ToolTable>();
@@ -86,43 +69,23 @@ public sealed partial class GuidAuditToolRunner : IToolRunner
             tables.Add(BuildTable("Duplicate Project GUIDs", projectDuplicates));
         }
 
-        if (objectDuplicates.Count > 0)
-        {
-            tables.Add(BuildTable("Duplicate Object GUIDs", objectDuplicates));
-        }
-
-        if (sameProjectRepeats.Count > 0)
-        {
-            tables.Add(BuildTable("Single-Project Repeats", sameProjectRepeats));
-        }
-
         var messages = new List<ToolMessage>();
-        if (skippedFiles.Count > 0)
+        if (skippedProjects.Count > 0)
         {
             messages.Add(new ToolMessage
             {
                 Level = ToolMessageLevel.Warning,
-                Text = $"Skipped {skippedFiles.Count} file(s) that could not be parsed as XML.",
+                Text = $"Skipped {skippedProjects.Count} project file(s) that could not be parsed as XML.",
             });
         }
 
-        if (sameProjectRepeats.Count > 0)
-        {
-            messages.Add(new ToolMessage
-            {
-                Level = ToolMessageLevel.Information,
-                Text = $"{sameProjectRepeats.Count} GUID value(s) repeat only inside a single project and are listed separately for review.",
-            });
-        }
-
-        var duplicateCount = projectDuplicates.Count + objectDuplicates.Count;
         return Task.FromResult(new ToolResult
         {
-            Status = duplicateCount == 0 ? ToolResultStatus.Success : ToolResultStatus.Warning,
+            Status = projectDuplicates.Count == 0 ? ToolResultStatus.Success : ToolResultStatus.Warning,
             Title = "GUID Audit",
-            Summary = duplicateCount == 0
+            Summary = projectDuplicates.Count == 0
                 ? "No cross-project GUID duplicates were found."
-                : $"{projectDuplicates.Count} project GUID collision group(s) and {objectDuplicates.Count} object GUID collision group(s) found.",
+                : $"{projectDuplicates.Count} project GUID collision group(s) found.",
             Messages = messages,
             Tables = tables,
         });
